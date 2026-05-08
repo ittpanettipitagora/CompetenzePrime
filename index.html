@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hub Registri Competenze</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f0ede8; --surface: #ffffff; --border: #d4cfc8;
+    --text: #1a1714; --text-muted: #6b6359; --accent: #2563eb;
+    --font: 'IBM Plex Sans', sans-serif; --mono: 'IBM Plex Mono', monospace;
+  }
+  body {
+    font-family: var(--font); background: var(--bg); color: var(--text);
+    display: flex; flex-direction: column; align-items: center; padding: 40px 20px;
+    margin: 0; min-height: 100vh;
+  }
+  .header { text-align: center; margin-bottom: 40px; }
+  .header h1 { font-family: var(--mono); font-size: 24px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .header p { color: var(--text-muted); font-size: 14px; }
+  
+  .grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 16px;
+    width: 100%; max-width: 600px;
+  }
+  
+  .class-btn {
+    display: flex; align-items: center; justify-content: center;
+    background: var(--surface); border: 2px solid var(--border); border-radius: 8px;
+    padding: 20px; font-size: 20px; font-weight: 600; font-family: var(--mono);
+    color: var(--text); text-decoration: none; transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  }
+  .class-btn:hover {
+    border-color: var(--accent); color: var(--accent); transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+</style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>Registri Competenze - Classi Prime
+</h1>
+    <p>Seleziona la tua classe per accedere al pannello di inserimento dati.</p>
+  </div>
+
+  <div class="grid">
+    <a href="1A.html" class="class-btn">1A</a>
+    <a href="1B.html" class="class-btn">1B</a>
+    <a href="1C.html" class="class-btn">1C</a>
+    <a href="1D.html" class="class-btn">1D</a>
+    <a href="1E.html" class="class-btn">1E</a>
+    <a href="1F.html" class="class-btn">1F</a>
+    <a href="1G.html" class="class-btn">1G</a>
+    <a href="1H.html" class="class-btn">1H</a>
+    <a href="1I.html" class="class-btn">1I</a>
+<a href="1L.html" class="class-btn">1L</a>
+  </div>
+
+</body>
+</html>
