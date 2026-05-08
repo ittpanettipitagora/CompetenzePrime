@@ -295,7 +295,13 @@ function caricaClasseDalDatabase() {
         if (!voti[a]) { voti[a] = {}; MATERIE.forEach(m => voti[a][m] = 0); }
         if (!votiFacoltativi[a]) {
           votiFacoltativi[a] = {};
-          for(let i=0; i<8; i++) { votiFacoltativi[a][i] = {}; MATERIE.forEach(m => votiFacoltativi[a][i][m] = 0); }
+          for(let i=0; i<8; i++) {
+            votiFacoltativi[a][i] = {};
+            MATERIE.forEach(m => {
+              // Parte dal valore del Generale come default
+              votiFacoltativi[a][i][m] = voti[a]?.[m] ?? 0;
+            });
+          }
         }
         if (avvaleIRC[a] === undefined) avvaleIRC[a] = true;
       });
@@ -305,6 +311,7 @@ function caricaClasseDalDatabase() {
         voti[a] = {}; votiFacoltativi[a] = {};
         for(let i=0; i<8; i++) votiFacoltativi[a][i] = {};
         MATERIE.forEach(m => { voti[a][m] = 0; for(let i=0; i<8; i++) votiFacoltativi[a][i][m] = 0; });
+        // Nota: quando i voti del Generale vengono aggiornati, le competenze NON vengono sincronizzate automaticamente
         avvaleIRC[a] = true;
       });
     }
@@ -347,15 +354,35 @@ function renderElenco() {
 }
 
 function makeVotoSelect(alunno, materia, isChar, compIdx = -1) {
-  let v = (compIdx === -1 || isChar) ? (voti[alunno]?.[materia] ?? 0) : (votiFacoltativi[alunno]?.[compIdx]?.[materia] ?? 0);
+  // Generale (compIdx === -1): legge da voti. Competenze: legge SEMPRE da votiFacoltativi
+  let v = (compIdx === -1) ? (voti[alunno]?.[materia] ?? 0) : (votiFacoltativi[alunno]?.[compIdx]?.[materia] ?? 0);
   let opts = `<option value="0">${isChar ? '* da compilare' : ''}</option>`;
   for (let i=1;i<=4;i++) opts += `<option value="${i}" ${v===i?'selected':''}>${i} — ${LIVELLI[i]}</option>`;
   return `<select class="voto-select" onchange="setVoto('${alunno.replace(/'/g,"\\\\'")}','${materia}',+this.value, ${isChar}, ${compIdx})">${opts}</select>`;
 }
 
 function setVoto(alunno, materia, val, isChar, compIdx) {
-  if (compIdx === -1 || isChar) { voti[alunno][materia] = val; renderGenerale(); renderAllComp(); }
-  else { votiFacoltativi[alunno][compIdx][materia] = val; renderCompPage(compIdx); }
+  if (compIdx === -1) {
+    // Modifica dal Generale: aggiorna voti (Generale)
+    const oldVal = voti[alunno][materia];
+    voti[alunno][materia] = val;
+    // Propaga alle competenze dove questa materia è caratterizzante,
+    // MA SOLO SE il valore nella competenza coincide ancora con il vecchio valore del Generale
+    // (cioè non è stato sovrascritto manualmente)
+    for (let ci = 0; ci < 8; ci++) {
+      if (COMP_CONFIG[ci].char.includes(MATERIE.indexOf(materia))) {
+        if ((votiFacoltativi[alunno]?.[ci]?.[materia] ?? 0) === oldVal) {
+          votiFacoltativi[alunno][ci][materia] = val;
+        }
+      }
+    }
+    renderGenerale();
+    renderAllComp();
+  } else {
+    // Modifica da una Competenza: aggiorna SOLO votiFacoltativi di quella competenza
+    votiFacoltativi[alunno][compIdx][materia] = val;
+    renderCompPage(compIdx);
+  }
   renderRiepilogo(); renderAlert();
 }
 
@@ -395,7 +422,7 @@ function renderCompPage(compIdx) {
     html += `<tr><td class="col-alunno">${a}</td>`;
     MATERIE.forEach((m,mi) => {
       const isChar = charSet.has(mi); const ircActive = avvaleIRC[a] !== false;
-      let v = isChar ? voti[a]?.[m] : votiFacoltativi[a]?.[compIdx]?.[m];
+      let v = votiFacoltativi[a]?.[compIdx]?.[m];
       if (m==='IRC' && !ircActive) html += `<td class="col-voto disabled" style="font-size:10px;">non si avvale</td>`;
       else html += `<td class="col-voto ${getCellClass(v)} ${isChar?'materia-char':''}">${makeVotoSelect(a,m,isChar, compIdx)}</td>`;
     });
@@ -408,7 +435,7 @@ function computeCompRow(alunno, cfg, compIdx) {
   const charSet = new Set(cfg.char); let totalPts = 0; let numFilled = 0; let allCharFilled = true;
   MATERIE.forEach((m, mi) => {
     if (m === 'IRC' && avvaleIRC[alunno] === false) return;
-    const isChar = charSet.has(mi); let v = isChar ? voti[alunno]?.[m] : votiFacoltativi[alunno]?.[compIdx]?.[m];
+    const isChar = charSet.has(mi); let v = votiFacoltativi[alunno]?.[compIdx]?.[m];
     if (v > 0) { totalPts += v; numFilled++; }
     if (isChar && (!v || v === 0)) allCharFilled = false;
   });
@@ -439,7 +466,7 @@ function renderAlert() {
     const charSet = new Set(COMP_CONFIG[ci].char); const notFilled = [];
     charSet.forEach(mi => {
       const m = MATERIE[mi];
-      if (alunni.some(a => (m!=='IRC' || avvaleIRC[a]!==false) && (!voti[a]?.[m] || voti[a][m]===0))) notFilled.push(m);
+      if (alunni.some(a => (m!=='IRC' || avvaleIRC[a]!==false) && (!votiFacoltativi[a]?.[ci]?.[m] || votiFacoltativi[a][ci][m]===0))) notFilled.push(m);
     });
     if(notFilled.length>0){
       anyAlert = true; html += `<div class="alert-item warning"><div class="alert-item-icon">⚠️</div><div class="alert-item-body"><div class="alert-item-comp">Competenza ${ci+1}</div><div class="alert-item-msg">Non sono correttamente compilate le seguenti materie: <strong>${notFilled.join(', ')}</strong></div></div></div>`;
