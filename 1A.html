@@ -506,31 +506,36 @@ const auth = firebase.auth();
 auth.onAuthStateChanged(user => {
   if (user) {
     if (user.email.endsWith("@" + DOMINIO_SCUOLA)) {
-      // Controllo permessi centralizzato
       try {
-        const permessi = getPermessiDocente(CLASSE_ATTUALE, user.email);
-        if (permessi) {
+        // Chiamata corretta: Email prima, Classe dopo
+        const permessi = getPermessiDocente(user.email, CLASSE_ATTUALE);
+
+        // CONTROLLO ESPLICITO: Deve essere permessi AND permessi.ok
+        if (permessi && permessi.ok) {
           window.utentePermessi = permessi;
           document.getElementById('login-overlay').style.display = 'none';
           document.getElementById('btn-logout').style.display = 'flex';
-          avviaApp(); // Avvia l'app solo dopo il controllo
+          document.getElementById('header-classe').textContent = `Classe ${CLASSE_ATTUALE} - Accesso: ${user.email}`;
+          
+          avviaApp(); // Avvia solo se tutto è confermato
+        } else {
+          // SE NON È OK, MOSTRA ALERT E TORNA ALLA HOME
+          alert("Accesso riservato: il docente non risulta assegnato al Consiglio di Classe di questa sezione.");
+          window.location.href = "index.html"; 
         }
       } catch (e) {
         console.error("Errore permessi:", e);
-        alert("Errore caricamento permessi. Contatta l'amministratore.");
+        alert("Errore critico caricamento permessi.");
       }
     } else {
       auth.signOut();
-      alert("Accesso negato.");
+      alert("Accesso negato: account non istituzionale.");
     }
   } else {
+    // Utente non loggato: mostra il login
     document.getElementById('login-overlay').style.display = 'flex';
+    document.getElementById('btn-logout').style.display = 'none';
   }
-});
-
-function doLogin() {
-  const provider = new firebase.auth.GoogleAuthProvider();
-  auth.signInWithPopup(provider);
-}</script>
+});</script>
 </body>
 </html>

@@ -7,7 +7,7 @@ const DOMINIO_SCUOLA = "panettipitagora.edu.it";
 // Super admin: accesso completo a tutto + pannello admin
 const SUPER_ADMIN_EMAILS = [
   // "alessandra.degaetano@panettipitagora.edu.it",
-"dirigente@panettipitagora.edu.it"
+dirigente@panettipitagora.edu.it
 ];
 
 // ============================================================
@@ -20,14 +20,6 @@ const SUPER_ADMIN_EMAILS = [
 // superAdmin:   true   -> accesso totale + pannello admin
 // ============================================================
 const DB_DOCENTI = {
-  "alessandra.degaetano@panettipitagora.edu.it": {
-    nome: "De Gaetano Alessandra",
-    classi: ["1G", "1A", "2A", "2E", "2I"], // Aggiungi qui le classi che ti servono
-    materie: ["ITALIANO"], // Aggiungi le tue materie
-    coordinatore: [],
-    sostegno: false,
-    superAdmin: false
-},
   "adriana.giorgio@panettipitagora.edu.it": {
     nome: "Giorgio Adriana",
     classi: ["1A", "2A", "2E", "2I"],
@@ -60,7 +52,14 @@ const DB_DOCENTI = {
     sostegno: true,
     superAdmin: false
   },
-  
+  "alessandra.degaetano@panettipitagora.edu.it": {
+    nome: "De Gaetano Alessandra",
+    classi: ["2G"],
+    materie: [],
+    coordinatore: [],
+    sostegno: false,
+    superAdmin: false
+  },
   "alfonso.giorgio@panettipitagora.edu.it": {
     nome: "Giorgio Alfonso",
     classi: ["1A", "1B", "2A", "2B"],
@@ -77,7 +76,7 @@ const DB_DOCENTI = {
     sostegno: false,
     superAdmin: false
   },
-  "andreina.putignano@panettipitagora.edu.it": {
+  "andreinavaleria.putignano@panettipitagora.edu.it": {
     nome: "Putignano Andreina Valeria",
     classi: ["1F", "1H", "2D", "2G", "2H"],
     materie: ["INGLESE"],
@@ -613,7 +612,7 @@ const DB_DOCENTI = {
     sostegno: true,
     superAdmin: false
   },
-  "rosaria.intonti@panettipitagora.edu.it": {
+  "rosariaannalisa.intonti@panettipitagora.edu.it": {
     nome: "Intonti Rosaria Annalisa",
     classi: ["1F", "1G", "1H", "1L", "2F", "2G", "2H"],
     materie: ["FISICA"],
@@ -731,32 +730,34 @@ const DB_DOCENTI = {
 // FUNZIONE DI CONTROLLO ACCESSO
 // ============================================================
 // FUNZIONE DI CONTROLLO ACCESSO (Non modificare)
-function getPermessiDocente(email, classeAttuale) {
-  if (SUPER_ADMIN_EMAILS.includes(email)) {
-    return { ok: true, superAdmin: true, coordinatore: true, sostegno: true, materie: [] };
+// 2. FUNZIONE DI CONTROLLO ACCESSO (Aggiornata per DB_DOCENTI)
+function controllaEApplicaPermessi(classeSelezionata, emailUtente) {
+  const doc = DB_DOCENTI[emailUtente];
+
+  // 1. Se il docente non esiste nel database
+  if (!doc) {
+    alert("Accesso riservato: il docente non risulta registrato nel sistema.");
+    window.location.href = "index.html";
+    return null;
   }
 
-  const doc = DB_DOCENTI[email];
-
-  if (!doc) return { ok: false, motivo: "account_non_configurato" };
-
-  if (doc.superAdmin) {
-    return { ok: true, superAdmin: true, coordinatore: true, sostegno: true, materie: [] };
+  // 2. Se la classe non è tra quelle assegnate al docente
+  if (!doc.classi.includes(classeSelezionata)) {
+    alert("Accesso riservato: il docente non risulta assegnato alla classe " + classeSelezionata);
+    window.location.href = "index.html";
+    return null;
   }
 
-  if (!doc.classi.includes(classeAttuale)) {
-    return { ok: false, motivo: "classe_non_autorizzata", classi: doc.classi };
-  }
+  // 3. Determina se è coordinatore per QUESTA specifica classe
+  // (Ora 'coordinatore' è un array, es: ["1A"])
+  const eCoordinatore = Array.isArray(doc.coordinatore) && doc.coordinatore.includes(classeSelezionata);
+  
+  // 4. Se è docente di sostegno, ha i permessi totali (come un coordinatore)
+  const haPermessiTotali = eCoordinatore || doc.sostegno || doc.superAdmin;
 
-  // CONTROLLO COORDINATORE: è un array, verifichiamo se contiene la classe attuale
-  const isCoordinatoreQui = Array.isArray(doc.coordinatore) && doc.coordinatore.includes(classeAttuale);
-
+  // Restituisce le autorizzazioni
   return {
-    ok: true,
-    superAdmin: false,
-    coordinatore: isCoordinatoreQui, 
-    sostegno: doc.sostegno,           
-    materie: doc.materie,             
-    nome: doc.nome
+    isCoordinatore: haPermessiTotali, // Se è coordinatore o sostegno, vede tutto
+    materieAbilitate: doc.materie     // Materie specifiche assegnate
   };
 }
