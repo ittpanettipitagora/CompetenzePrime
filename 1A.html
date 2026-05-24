@@ -501,7 +501,7 @@ document.getElementById('alunni-grid').addEventListener('click', e => {
 
 // AGGIUNTA 5: Inizializzazione Auth Google e validazione utente
 const auth = firebase.auth();
-const DOMINIO_SCUOLA = "panettipitagora.edu.it";
+
 
 auth.onAuthStateChanged(user => {
   if (user) {
