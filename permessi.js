@@ -21,6 +21,14 @@ dirigente@panettipitagora.edu.it
 // ============================================================
 const DB_DOCENTI = {
   "alessandra.degaetano@panettipitagora.edu.it": {
+    nome: "De Gaetano Alessandra",
+    classi: ["1G", "1A", "2A", "2E", "2I"], // Aggiungi qui le classi che ti servono
+    materie: ["ITALIANO"], // Aggiungi le tue materie
+    coordinatore: [],
+    sostegno: false,
+    superAdmin: false
+},
+  "adriana.giorgio@panettipitagora.edu.it": {
     nome: "Giorgio Adriana",
     classi: ["1A", "2A", "2E", "2I"],
     materie: ["INGLESE"],
