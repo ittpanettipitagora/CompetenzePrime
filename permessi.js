@@ -54,9 +54,9 @@ const DB_DOCENTI = {
   },
   "alessandra.degaetano@panettipitagora.edu.it": {
     nome: "De Gaetano Alessandra",
-    classi: ["1A"],
-    materie: ["ITALIANO"],
-    coordinatore: ["1A"],
+    classi: ["2G"],
+    materie: [],
+    coordinatore: [],
     sostegno: false,
     superAdmin: false
   },
