@@ -150,8 +150,12 @@ const DB_DOCENTI = {
   },
   "antonella.pulito@panettipitagora.edu.it": {
     nome: "Pulito Antonella",
-    classi: ["1G", "1H", "1I", "2H"],
-    materie: ["GEOGRAFIA", "CHIMICA", "SCIENZE"],
+    assegnazioni: {
+      "1G": ["GEOGRAFIA"],
+      "1H": ["SCIENZE", "GEOGRAFIA", "CHIMICA"],
+      "1I": ["SCIENZE", "GEOGRAFIA", "CHIMICA"],
+      "2H": ["SCIENZE", "CHIMICA"]
+    },
     coordinatore: ["1H"],
     sostegno: false,
     superAdmin: false
@@ -310,8 +314,14 @@ const DB_DOCENTI = {
   },
   "francesca.paternoster@panettipitagora.edu.it": {
     nome: "Paternoster Francesca",
-    classi: ["1A", "1B", "1E", "1G", "1I", "2I"],
-    materie: ["TECNOLOGIE INFORMATICHE","STA"],
+    assegnazioni: {
+      "1A": ["TECNOLOGIE INFORMATICHE"],
+      "1B": ["TECNOLOGIE INFORMATICHE"],
+      "1E": ["TECNOLOGIE INFORMATICHE"],
+      "1G": ["TECNOLOGIE INFORMATICHE"],
+      "1I": ["TECNOLOGIE INFORMATICHE"],
+      "2I": ["STA"]
+    },
     coordinatore: [],
     sostegno: false,
     superAdmin: false
@@ -702,16 +712,27 @@ const DB_DOCENTI = {
   },
   "vita.magrone@panettipitagora.edu.it": {
     nome: "Magrone Vita",
-    classi: ["1C", "1D", "1G", "2C", "2D"],
-    materie: ["CHIMICA", "SCIENZE", "GEOGRAFIA"],
+    assegnazioni: {
+      "1C": ["CHIMICA", "SCIENZE"],
+      "1D": ["CHIMICA", "GEOGRAFIA", "SCIENZE"],
+      "1G": ["CHIMICA", "SCIENZE"],
+      "2C": ["CHIMICA", "SCIENZE"],
+      "2D": ["SCIENZE"]
+    },
     coordinatore: [],
     sostegno: false,
     superAdmin: false
   },
   "vito.lamantia@panettipitagora.edu.it": {
     nome: "La Mantia Vito",
-    classi: ["1E", "1F", "1L", "2E", "2F", "2G"],
-    materie: ["CHIMICA", "SCIENZE", "GEOGRAFIA"],
+    assegnazioni: {
+      "1E": ["CHIMICA", "SCIENZE"],
+      "1F": ["CHIMICA", "SCIENZE", "GEOGRAFIA"],
+      "1L": ["CHIMICA"],
+      "2E": ["SCIENZE"],
+      "2F": ["CHIMICA", "SCIENZE"],
+      "2G": ["SCIENZE"]
+    },
     coordinatore: [],
     sostegno: false,
     superAdmin: false
@@ -730,24 +751,32 @@ const DB_DOCENTI = {
 // FUNZIONE DI CONTROLLO ACCESSO
 // ============================================================
 function getPermessiDocente(emailUtente, classeSelezionata) {
-  // 1. Controllo se è super admin
   const isSuperAdmin = SUPER_ADMIN_EMAILS.includes(emailUtente);
-  
   const doc = DB_DOCENTI[emailUtente];
 
-  // Se è super admin, saltiamo il controllo classe, altrimenti verifichiamo il DB
   if (!isSuperAdmin && !doc) return { ok: false, motivo: "account_non_configurato" };
-  if (!isSuperAdmin && !doc.classi.includes(classeSelezionata)) {
-    return { ok: false, motivo: "classe_non_autorizzata" };
-  }
 
-  // 2. Determiniamo i permessi
-  const eCoordinatore = isSuperAdmin || (doc && Array.isArray(doc.coordinatore) && doc.coordinatore.includes(classeSelezionata));
-  
-  return {
-    ok: true,
-    isCoordinatore: eCoordinatore,
-    isSuperAdmin: isSuperAdmin, // Passiamo questo flag al front-end
-    materieAbilitate: isSuperAdmin ? MATERIE : (doc ? doc.materie : []) 
-  };
+  // Logica differenziata tra nuova struttura (assegnazioni) e vecchia (classi/materie)
+  if (doc && doc.assegnazioni) {
+    if (!doc.assegnazioni[classeSelezionata] && !isSuperAdmin) {
+      return { ok: false, motivo: "classe_non_autorizzata" };
+    }
+    return {
+      ok: true,
+      isCoordinatore: isSuperAdmin || (Array.isArray(doc.coordinatore) && doc.coordinatore.includes(classeSelezionata)),
+      isSuperAdmin: isSuperAdmin,
+      materieAbilitate: isSuperAdmin ? MATERIE : doc.assegnazioni[classeSelezionata]
+    };
+  } else {
+    // Gestione vecchia struttura per docenti non ancora migrati
+    if (!isSuperAdmin && !doc.classi.includes(classeSelezionata)) {
+      return { ok: false, motivo: "classe_non_autorizzata" };
+    }
+    return {
+      ok: true,
+      isCoordinatore: isSuperAdmin || (doc && Array.isArray(doc.coordinatore) && doc.coordinatore.includes(classeSelezionata)),
+      isSuperAdmin: isSuperAdmin,
+      materieAbilitate: isSuperAdmin ? MATERIE : (doc ? doc.materie : [])
+    };
+  }
 }
