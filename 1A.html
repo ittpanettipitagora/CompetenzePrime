@@ -506,29 +506,31 @@ const DOMINIO_SCUOLA = "panettipitagora.edu.it";
 auth.onAuthStateChanged(user => {
   if (user) {
     if (user.email.endsWith("@" + DOMINIO_SCUOLA)) {
-      const permessi = controllaEApplicaPermessi(CLASSE_ATTUALE, user.email);
-      if (permessi) {
-        window.utentePermessi = permessi;
-        document.getElementById('login-overlay').style.display = 'none';
-        document.getElementById('btn-logout').style.display = 'flex';
-        document.getElementById('header-classe').textContent = `Classe ${CLASSE_ATTUALE} - Accesso: ${user.email}`;
-        avviaApp();
+      // Controllo permessi centralizzato
+      try {
+        const permessi = controllaEApplicaPermessi(CLASSE_ATTUALE, user.email);
+        if (permessi) {
+          window.utentePermessi = permessi;
+          document.getElementById('login-overlay').style.display = 'none';
+          document.getElementById('btn-logout').style.display = 'flex';
+          avviaApp(); // Avvia l'app solo dopo il controllo
+        }
+      } catch (e) {
+        console.error("Errore permessi:", e);
+        alert("Errore caricamento permessi. Contatta l'amministratore.");
       }
     } else {
       auth.signOut();
-      alert("Accesso negato. Usa l'account istituzionale @panettipitagora.edu.it");
+      alert("Accesso negato.");
     }
   } else {
     document.getElementById('login-overlay').style.display = 'flex';
-    document.getElementById('btn-logout').style.display = 'none';
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   }
 });
 
 function doLogin() {
   const provider = new firebase.auth.GoogleAuthProvider();
-  auth.signInWithPopup(provider).catch(err => alert("Errore di login: " + err.message));
-}
-</script>
+  auth.signInWithPopup(provider);
+}</script>
 </body>
 </html>
