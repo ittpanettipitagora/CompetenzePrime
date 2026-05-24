@@ -729,23 +729,25 @@ const DB_DOCENTI = {
 // ============================================================
 // FUNZIONE DI CONTROLLO ACCESSO
 // ============================================================
-// FUNZIONE DI CONTROLLO ACCESSO (Non modificare)
-// 2. FUNZIONE DI CONTROLLO ACCESSO (Aggiornata per DB_DOCENTI)
 function getPermessiDocente(emailUtente, classeSelezionata) {
   const doc = DB_DOCENTI[emailUtente];
 
   if (!doc) return { ok: false, motivo: "account_non_configurato" };
 
+  // Controllo se il docente è associato alla classe
   if (!doc.classi.includes(classeSelezionata)) {
     return { ok: false, motivo: "classe_non_autorizzata" };
   }
 
+  // NUOVA LOGICA: 
+  // 1. È coordinatore o sostegno o superadmin?
   const eCoordinatore = Array.isArray(doc.coordinatore) && doc.coordinatore.includes(classeSelezionata);
   const haPermessiTotali = eCoordinatore || doc.sostegno || doc.superAdmin;
 
   return {
     ok: true,
     isCoordinatore: haPermessiTotali,
+    // Aggiungiamo anche le materie autorizzate
     materieAbilitate: doc.materie
   };
 }
