@@ -56,7 +56,7 @@ const DB_DOCENTI = {
     nome: "De Gaetano Alessandra",
     classi: ["1A"],
     materie: ["IRC"],
-    coordinatore: ["1A"],
+    coordinatore: [],
     sostegno: false,
     superAdmin: false
   },
