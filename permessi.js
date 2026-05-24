@@ -76,7 +76,7 @@ const DB_DOCENTI = {
     sostegno: false,
     superAdmin: false
   },
-  "andreinavaleria.putignano@panettipitagora.edu.it": {
+  "andreina.putignano@panettipitagora.edu.it": {
     nome: "Putignano Andreina Valeria",
     classi: ["1F", "1H", "2D", "2G", "2H"],
     materie: ["INGLESE"],
@@ -612,7 +612,7 @@ const DB_DOCENTI = {
     sostegno: true,
     superAdmin: false
   },
-  "rosariaannalisa.intonti@panettipitagora.edu.it": {
+  "rosaria.intonti@panettipitagora.edu.it": {
     nome: "Intonti Rosaria Annalisa",
     classi: ["1F", "1G", "1H", "1L", "2F", "2G", "2H"],
     materie: ["FISICA"],
