@@ -7,7 +7,9 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="permessi.js"></script>
 
 <style>
 :root {
@@ -109,6 +111,8 @@ body {
 
 .voto-select { width: 100%; border: none; background: transparent; font-family: var(--font); font-size: 12px; text-align: center; cursor: pointer; padding: 6px 4px; outline: none; color: var(--text); }
 .voto-select:focus { background: var(--accent-light); }
+/* Stile per select disabilitata */
+.voto-select:disabled { cursor: not-allowed; color: #9ca3af; }
 
 td.level-1 { background: #fef2f2 !important; } td.level-2 { background: #fffbeb !important; } td.level-3 { background: #f0fdf4 !important; } td.level-4 { background: #eff6ff !important; }
 
@@ -147,12 +151,23 @@ td.level-1 { background: #fef2f2 !important; } td.level-2 { background: #fffbeb 
 </head>
 <body>
 
+<div id="login-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:var(--bg); z-index:9999; flex-direction:column; align-items:center; justify-content:center;">
+  <div class="card" style="padding: 40px; text-align: center; max-width: 400px; width: 90%;">
+    <h2 style="font-family:var(--mono); margin-bottom: 20px;">Registro Competenze</h2>
+    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 30px;">Accesso riservato ai docenti</p>
+    <button class="btn-salva-main" style="width: 100%; justify-content: center; background: var(--accent);" onclick="doLogin()">Accedi con Google</button>
+  </div>
+</div>
+
 <header class="app-header">
   <div class="header-left">
     <h1>Registro Competenze</h1>
     <div class="subtitle" id="header-classe">Caricamento in corso...</div>
   </div>
-  <button id="btn-salva" class="btn-salva-main" onclick="salvaTutto()" disabled>💾 Salva Dati</button>
+  <div style="display: flex; gap: 10px;">
+    <button id="btn-salva" class="btn-salva-main" onclick="salvaTutto()" disabled>💾 Salva Dati</button>
+    <button onclick="firebase.auth().signOut()" class="btn-salva-main" style="background:var(--red); display:none;" id="btn-logout">Esci</button>
+  </div>
 </header>
 
 <div class="tabs-bar">
@@ -278,6 +293,9 @@ const LIVELLI_PILL_CLS = {1:"l1",2:"l2",3:"l3",4:"l4"};
 
 let alunni = []; let voti = {}; let votiFacoltativi = {}; let avvaleIRC = {}; 
 
+// AGGIUNTA 4: Variabile per memorizzare i permessi ricevuti
+window.utentePermessi = null;
+
 function avviaApp() {
   document.getElementById('header-classe').textContent = `Classe ${CLASSE_ATTUALE}`;
   document.getElementById('titolo-sezione-classe').textContent = `Registro: Classe ${CLASSE_ATTUALE}`;
@@ -295,13 +313,7 @@ function caricaClasseDalDatabase() {
         if (!voti[a]) { voti[a] = {}; MATERIE.forEach(m => voti[a][m] = 0); }
         if (!votiFacoltativi[a]) {
           votiFacoltativi[a] = {};
-          for(let i=0; i<8; i++) {
-            votiFacoltativi[a][i] = {};
-            MATERIE.forEach(m => {
-              // Parte dal valore del Generale come default
-              votiFacoltativi[a][i][m] = voti[a]?.[m] ?? 0;
-            });
-          }
+          for(let i=0; i<8; i++) { votiFacoltativi[a][i] = {}; MATERIE.forEach(m => votiFacoltativi[a][i][m] = 0); }
         }
         if (avvaleIRC[a] === undefined) avvaleIRC[a] = true;
       });
@@ -311,7 +323,6 @@ function caricaClasseDalDatabase() {
         voti[a] = {}; votiFacoltativi[a] = {};
         for(let i=0; i<8; i++) votiFacoltativi[a][i] = {};
         MATERIE.forEach(m => { voti[a][m] = 0; for(let i=0; i<8; i++) votiFacoltativi[a][i][m] = 0; });
-        // Nota: quando i voti del Generale vengono aggiornati, le competenze NON vengono sincronizzate automaticamente
         avvaleIRC[a] = true;
       });
     }
@@ -344,45 +355,38 @@ function renderElenco() {
   document.getElementById('num-alunni-badge').style.display = 'inline-flex';
   document.getElementById('num-alunni-val').textContent = alunni.length;
 
+  // Controllo autorizzazione bottone IRC
+  let isIrcDisabilitato = false;
+  if (window.utentePermessi) {
+    isIrcDisabilitato = !(window.utentePermessi.isCoordinatore || window.utentePermessi.materieAbilitate.includes("IRC"));
+  }
+
   grid.innerHTML = alunni.map((a,i) => {
     const avvale = avvaleIRC[a] !== false;
     return `<div class="alunno-chip" style="justify-content:space-between">
       <span style="display:flex;align-items:center;gap:6px"><span class="alunno-num">${i+1}.</span>${a}</span>
-      <button class="irc-toggle-btn" data-idx="${i}" style="font-size:10px;padding:2px 7px;border-radius:4px;border:1px solid;cursor:pointer;background:${avvale?'#dcfce7':'#f3f4f6'};color:${avvale?'#15803d':'#6b7280'};border-color:${avvale?'#86efac':'#d1d5db'};font-family:var(--mono);font-weight:600;">IRC: ${avvale?'SI':'NO'}</button>
+      <button class="irc-toggle-btn" data-idx="${i}" ${isIrcDisabilitato ? 'disabled' : ''} style="font-size:10px;padding:2px 7px;border-radius:4px;border:1px solid;cursor:${isIrcDisabilitato ? 'not-allowed' : 'pointer'};background:${avvale?'#dcfce7':'#f3f4f6'};color:${avvale?'#15803d':'#6b7280'};border-color:${avvale?'#86efac':'#d1d5db'};font-family:var(--mono);font-weight:600;opacity:${isIrcDisabilitato ? '0.5' : '1'}">IRC: ${avvale?'SI':'NO'}</button>
     </div>`;
   }).join('');
 }
 
 function makeVotoSelect(alunno, materia, isChar, compIdx = -1) {
-  // Generale (compIdx === -1): legge da voti. Competenze: legge SEMPRE da votiFacoltativi
-  let v = (compIdx === -1) ? (voti[alunno]?.[materia] ?? 0) : (votiFacoltativi[alunno]?.[compIdx]?.[materia] ?? 0);
+  let v = (compIdx === -1 || isChar) ? (voti[alunno]?.[materia] ?? 0) : (votiFacoltativi[alunno]?.[compIdx]?.[materia] ?? 0);
   let opts = `<option value="0">${isChar ? '* da compilare' : ''}</option>`;
   for (let i=1;i<=4;i++) opts += `<option value="${i}" ${v===i?'selected':''}>${i} — ${LIVELLI[i]}</option>`;
-  return `<select class="voto-select" onchange="setVoto('${alunno.replace(/'/g,"\\\\'")}','${materia}',+this.value, ${isChar}, ${compIdx})">${opts}</select>`;
+  
+  // Controllo autorizzazione Select
+  let isDisabilitato = false;
+  if (window.utentePermessi) {
+    isDisabilitato = !(window.utentePermessi.isCoordinatore || window.utentePermessi.materieAbilitate.includes(materia));
+  }
+
+  return `<select class="voto-select" ${isDisabilitato ? 'disabled' : ''} onchange="setVoto('${alunno.replace(/'/g,"\\\\'")}','${materia}',+this.value, ${isChar}, ${compIdx})">${opts}</select>`;
 }
 
 function setVoto(alunno, materia, val, isChar, compIdx) {
-  if (compIdx === -1) {
-    // Modifica dal Generale: aggiorna voti (Generale)
-    const oldVal = voti[alunno][materia];
-    voti[alunno][materia] = val;
-    // Propaga alle competenze dove questa materia è caratterizzante,
-    // MA SOLO SE il valore nella competenza coincide ancora con il vecchio valore del Generale
-    // (cioè non è stato sovrascritto manualmente)
-    for (let ci = 0; ci < 8; ci++) {
-      if (COMP_CONFIG[ci].char.includes(MATERIE.indexOf(materia))) {
-        if ((votiFacoltativi[alunno]?.[ci]?.[materia] ?? 0) === oldVal) {
-          votiFacoltativi[alunno][ci][materia] = val;
-        }
-      }
-    }
-    renderGenerale();
-    renderAllComp();
-  } else {
-    // Modifica da una Competenza: aggiorna SOLO votiFacoltativi di quella competenza
-    votiFacoltativi[alunno][compIdx][materia] = val;
-    renderCompPage(compIdx);
-  }
+  if (compIdx === -1 || isChar) { voti[alunno][materia] = val; renderGenerale(); renderAllComp(); }
+  else { votiFacoltativi[alunno][compIdx][materia] = val; renderCompPage(compIdx); }
   renderRiepilogo(); renderAlert();
 }
 
@@ -422,7 +426,7 @@ function renderCompPage(compIdx) {
     html += `<tr><td class="col-alunno">${a}</td>`;
     MATERIE.forEach((m,mi) => {
       const isChar = charSet.has(mi); const ircActive = avvaleIRC[a] !== false;
-      let v = votiFacoltativi[a]?.[compIdx]?.[m];
+      let v = isChar ? voti[a]?.[m] : votiFacoltativi[a]?.[compIdx]?.[m];
       if (m==='IRC' && !ircActive) html += `<td class="col-voto disabled" style="font-size:10px;">non si avvale</td>`;
       else html += `<td class="col-voto ${getCellClass(v)} ${isChar?'materia-char':''}">${makeVotoSelect(a,m,isChar, compIdx)}</td>`;
     });
@@ -435,7 +439,7 @@ function computeCompRow(alunno, cfg, compIdx) {
   const charSet = new Set(cfg.char); let totalPts = 0; let numFilled = 0; let allCharFilled = true;
   MATERIE.forEach((m, mi) => {
     if (m === 'IRC' && avvaleIRC[alunno] === false) return;
-    const isChar = charSet.has(mi); let v = votiFacoltativi[alunno]?.[compIdx]?.[m];
+    const isChar = charSet.has(mi); let v = isChar ? voti[alunno]?.[m] : votiFacoltativi[alunno]?.[compIdx]?.[m];
     if (v > 0) { totalPts += v; numFilled++; }
     if (isChar && (!v || v === 0)) allCharFilled = false;
   });
@@ -466,7 +470,7 @@ function renderAlert() {
     const charSet = new Set(COMP_CONFIG[ci].char); const notFilled = [];
     charSet.forEach(mi => {
       const m = MATERIE[mi];
-      if (alunni.some(a => (m!=='IRC' || avvaleIRC[a]!==false) && (!votiFacoltativi[a]?.[ci]?.[m] || votiFacoltativi[a][ci][m]===0))) notFilled.push(m);
+      if (alunni.some(a => (m!=='IRC' || avvaleIRC[a]!==false) && (!voti[a]?.[m] || voti[a][m]===0))) notFilled.push(m);
     });
     if(notFilled.length>0){
       anyAlert = true; html += `<div class="alert-item warning"><div class="alert-item-icon">⚠️</div><div class="alert-item-body"><div class="alert-item-comp">Competenza ${ci+1}</div><div class="alert-item-msg">Non sono correttamente compilate le seguenti materie: <strong>${notFilled.join(', ')}</strong></div></div></div>`;
@@ -495,7 +499,38 @@ document.getElementById('alunni-grid').addEventListener('click', e => {
   if (btn) toggleIRC(alunni[+btn.dataset.idx]);
 });
 
-window.onload = avviaApp; // Fa partire tutto appena si apre la pagina
-</script>
+// AGGIUNTA 5: Inizializzazione Auth Google e validazione utente
+const auth = firebase.auth();
+const DOMINIO_SCUOLA = "panettipitagora.edu.it";
+
+auth.onAuthStateChanged(user => {
+  if (user) {
+    if (user.email.endsWith("@" + DOMINIO_SCUOLA)) {
+      // Controllo permessi centralizzato
+      try {
+        const permessi = controllaEApplicaPermessi(CLASSE_ATTUALE, user.email);
+        if (permessi) {
+          window.utentePermessi = permessi;
+          document.getElementById('login-overlay').style.display = 'none';
+          document.getElementById('btn-logout').style.display = 'flex';
+          avviaApp(); // Avvia l'app solo dopo il controllo
+        }
+      } catch (e) {
+        console.error("Errore permessi:", e);
+        alert("Errore caricamento permessi. Contatta l'amministratore.");
+      }
+    } else {
+      auth.signOut();
+      alert("Accesso negato.");
+    }
+  } else {
+    document.getElementById('login-overlay').style.display = 'flex';
+  }
+});
+
+function doLogin() {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(provider);
+}</script>
 </body>
 </html>
