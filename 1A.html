@@ -508,7 +508,7 @@ auth.onAuthStateChanged(user => {
     if (user.email.endsWith("@" + DOMINIO_SCUOLA)) {
       // Controllo permessi centralizzato
       try {
-        const permessi = controllaEApplicaPermessi(CLASSE_ATTUALE, user.email);
+        const permessi = getPermessiDocente(CLASSE_ATTUALE, user.email);
         if (permessi) {
           window.utentePermessi = permessi;
           document.getElementById('login-overlay').style.display = 'none';
