@@ -729,36 +729,33 @@ const DB_DOCENTI = {
 // ============================================================
 // FUNZIONE DI CONTROLLO ACCESSO
 // ============================================================
+// FUNZIONE DI CONTROLLO ACCESSO (Non modificare)
 function getPermessiDocente(email, classeAttuale) {
-  // Super admin hardcoded
   if (SUPER_ADMIN_EMAILS.includes(email)) {
     return { ok: true, superAdmin: true, coordinatore: true, sostegno: true, materie: [] };
   }
 
   const doc = DB_DOCENTI[email];
 
-  // Account non nel database
   if (!doc) return { ok: false, motivo: "account_non_configurato" };
 
-  // Super admin da DB
   if (doc.superAdmin) {
     return { ok: true, superAdmin: true, coordinatore: true, sostegno: true, materie: [] };
   }
 
-  // Classe non autorizzata
   if (!doc.classi.includes(classeAttuale)) {
     return { ok: false, motivo: "classe_non_autorizzata", classi: doc.classi };
   }
 
-  // Verifica se il docente è coordinatore IN QUESTA SPECIFICA CLASSE
+  // CONTROLLO COORDINATORE: è un array, verifichiamo se contiene la classe attuale
   const isCoordinatoreQui = Array.isArray(doc.coordinatore) && doc.coordinatore.includes(classeAttuale);
 
   return {
     ok: true,
     superAdmin: false,
-    coordinatore: isCoordinatoreQui,  // true SOLO se è coordinatore della classe corrente
-    sostegno: doc.sostegno,           // true = tutte le materie di tutte le classi
-    materie: doc.materie,             // materie specifiche se docente normale
+    coordinatore: isCoordinatoreQui, 
+    sostegno: doc.sostegno,           
+    materie: doc.materie,             
     nome: doc.nome
   };
 }
