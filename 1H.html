@@ -375,15 +375,19 @@ function makeVotoSelect(alunno, materia, isChar, compIdx = -1) {
   let opts = `<option value="0">${isChar ? '* da compilare' : ''}</option>`;
   for (let i=1;i<=4;i++) opts += `<option value="${i}" ${v===i?'selected':''}>${i} — ${LIVELLI[i]}</option>`;
   
-  // Controllo autorizzazione Select
+  // LOGICA DI CONTROLLO ACCESSO:
   let isDisabilitato = false;
   if (window.utentePermessi) {
-    isDisabilitato = !(window.utentePermessi.isCoordinatore || window.utentePermessi.materieAbilitate.includes(materia));
+    // Sei disabilitata SOLO SE:
+    // NON sei coordinatrice E la materia NON è tra le tue materie abilitate
+    const seiCoordinatore = window.utentePermessi.isCoordinatore;
+    const materiaTua = window.utentePermessi.materieAbilitate.includes(materia);
+    
+    isDisabilitato = !(seiCoordinatore || materiaTua);
   }
 
   return `<select class="voto-select" ${isDisabilitato ? 'disabled' : ''} onchange="setVoto('${alunno.replace(/'/g,"\\\\'")}','${materia}',+this.value, ${isChar}, ${compIdx})">${opts}</select>`;
 }
-
 function setVoto(alunno, materia, val, isChar, compIdx) {
   if (compIdx === -1 || isChar) { voti[alunno][materia] = val; renderGenerale(); renderAllComp(); }
   else { votiFacoltativi[alunno][compIdx][materia] = val; renderCompPage(compIdx); }
@@ -501,36 +505,41 @@ document.getElementById('alunni-grid').addEventListener('click', e => {
 
 // AGGIUNTA 5: Inizializzazione Auth Google e validazione utente
 const auth = firebase.auth();
-const DOMINIO_SCUOLA = "panettipitagora.edu.it";
+
 
 auth.onAuthStateChanged(user => {
   if (user) {
     if (user.email.endsWith("@" + DOMINIO_SCUOLA)) {
-      // Controllo permessi centralizzato
       try {
-        const permessi = controllaEApplicaPermessi(CLASSE_ATTUALE, user.email);
-        if (permessi) {
+        // Chiamata corretta: Email prima, Classe dopo
+        const permessi = getPermessiDocente(user.email, CLASSE_ATTUALE);
+
+        // CONTROLLO ESPLICITO: Deve essere permessi AND permessi.ok
+        if (permessi && permessi.ok) {
           window.utentePermessi = permessi;
           document.getElementById('login-overlay').style.display = 'none';
           document.getElementById('btn-logout').style.display = 'flex';
-          avviaApp(); // Avvia l'app solo dopo il controllo
+          document.getElementById('header-classe').textContent = `Classe ${CLASSE_ATTUALE} - Accesso: ${user.email}`;
+          
+          avviaApp(); // Avvia solo se tutto è confermato
+        } else {
+          // SE NON È OK, MOSTRA ALERT E TORNA ALLA HOME
+          alert("Accesso riservato: il docente non risulta assegnato al Consiglio di Classe di questa sezione.");
+          window.location.href = "index.html"; 
         }
       } catch (e) {
         console.error("Errore permessi:", e);
-        alert("Errore caricamento permessi. Contatta l'amministratore.");
+        alert("Errore critico caricamento permessi.");
       }
     } else {
       auth.signOut();
-      alert("Accesso negato.");
+      alert("Accesso negato: account non istituzionale.");
     }
   } else {
+    // Utente non loggato: mostra il login
     document.getElementById('login-overlay').style.display = 'flex';
+    document.getElementById('btn-logout').style.display = 'none';
   }
-});
-
-function doLogin() {
-  const provider = new firebase.auth.GoogleAuthProvider();
-  auth.signInWithPopup(provider);
-}</script>
+});</script>
 </body>
 </html>
