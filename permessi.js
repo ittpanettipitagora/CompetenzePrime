@@ -55,7 +55,7 @@ const DB_DOCENTI = {
   "alessandra.degaetano@panettipitagora.edu.it": {
     nome: "De Gaetano Alessandra",
     classi: ["2G"],
-    materie: [],
+    materie: ["STA"],
     coordinatore: [],
     sostegno: false,
     superAdmin: true
@@ -286,7 +286,7 @@ const DB_DOCENTI = {
   },
   "domenico.terrafino@panettipitagora.edu.it": {
     nome: "Terrafino Domenico",
-    classi: ["1C", "1D", "1E", "1F", "1H", "2C", "2E", "2F", "2H"],
+    classi: ["1C", "1E", "1F", "1H", "2C", "2E", "2F", "2H"],
     materie: ["TTRG"],
     coordinatore: [],
     sostegno: false,
@@ -311,7 +311,7 @@ const DB_DOCENTI = {
   "francesca.paternoster@panettipitagora.edu.it": {
     nome: "Paternoster Francesca",
     classi: ["1A", "1B", "1E", "1G", "1I", "2I"],
-    materie: ["TECNOLOGIE INFORMATICHE"],
+    materie: ["TECNOLOGIE INFORMATICHE","STA"],
     coordinatore: [],
     sostegno: false,
     superAdmin: false
@@ -559,7 +559,7 @@ const DB_DOCENTI = {
   "nadia.salvatore@panettipitagora.edu.it": {
     nome: "Salvatore Nadia",
     classi: ["2D", "2E", "2F"],
-    materie: [],
+    materie: ["STA"],
     coordinatore: [],
     sostegno: false,
     superAdmin: false
@@ -612,7 +612,7 @@ const DB_DOCENTI = {
     sostegno: true,
     superAdmin: false
   },
-  "rosariaannalisa.intonti@panettipitagora.edu.it": {
+  "rosaria.intonti@panettipitagora.edu.it": {
     nome: "Intonti Rosaria Annalisa",
     classi: ["1F", "1G", "1H", "1L", "2F", "2G", "2H"],
     materie: ["FISICA"],
@@ -639,7 +639,7 @@ const DB_DOCENTI = {
   "sergio.santostasi@panettipitagora.edu.it": {
     nome: "Santostasi Sergio",
     classi: ["2C", "2H"],
-    materie: [],
+    materie: ["STA"],
     coordinatore: [],
     sostegno: false,
     superAdmin: false
