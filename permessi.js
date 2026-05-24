@@ -58,7 +58,7 @@ const DB_DOCENTI = {
     materie: [],
     coordinatore: [],
     sostegno: false,
-    superAdmin: false
+    superAdmin: true
   },
   "alfonso.giorgio@panettipitagora.edu.it": {
     nome: "Giorgio Alfonso",
