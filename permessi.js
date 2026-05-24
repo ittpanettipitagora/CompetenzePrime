@@ -7,7 +7,7 @@ const DOMINIO_SCUOLA = "panettipitagora.edu.it";
 // Super admin: accesso completo a tutto + pannello admin
 const SUPER_ADMIN_EMAILS = [
   // "alessandra.degaetano@panettipitagora.edu.it",
-"dirigente@panettipitagora.edu.it"
+dirigente@panettipitagora.edu.it
 ];
 
 // ============================================================
@@ -54,8 +54,8 @@ const DB_DOCENTI = {
   },
   "alessandra.degaetano@panettipitagora.edu.it": {
     nome: "De Gaetano Alessandra",
-    classi: ["1A"],
-    materie: ["ITALIANO"],
+    classi: ["2G"],
+    materie: [],
     coordinatore: [],
     sostegno: false,
     superAdmin: false
@@ -731,33 +731,21 @@ const DB_DOCENTI = {
 // ============================================================
 // FUNZIONE DI CONTROLLO ACCESSO (Non modificare)
 // 2. FUNZIONE DI CONTROLLO ACCESSO (Aggiornata per DB_DOCENTI)
-function controllaEApplicaPermessi(classeSelezionata, emailUtente) {
+function getPermessiDocente(emailUtente, classeSelezionata) {
   const doc = DB_DOCENTI[emailUtente];
 
-  // 1. Se il docente non esiste nel database
-  if (!doc) {
-    alert("Accesso riservato: il docente non risulta registrato nel sistema.");
-    window.location.href = "index.html";
-    return null;
-  }
+  if (!doc) return { ok: false, motivo: "account_non_configurato" };
 
-  // 2. Se la classe non è tra quelle assegnate al docente
   if (!doc.classi.includes(classeSelezionata)) {
-    alert("Accesso riservato: il docente non risulta assegnato alla classe " + classeSelezionata);
-    window.location.href = "index.html";
-    return null;
+    return { ok: false, motivo: "classe_non_autorizzata" };
   }
 
-  // 3. Determina se è coordinatore per QUESTA specifica classe
-  // (Ora 'coordinatore' è un array, es: ["1A"])
   const eCoordinatore = Array.isArray(doc.coordinatore) && doc.coordinatore.includes(classeSelezionata);
-  
-  // 4. Se è docente di sostegno, ha i permessi totali (come un coordinatore)
   const haPermessiTotali = eCoordinatore || doc.sostegno || doc.superAdmin;
 
-  // Restituisce le autorizzazioni
   return {
-    isCoordinatore: haPermessiTotali, // Se è coordinatore o sostegno, vede tutto
-    materieAbilitate: doc.materie     // Materie specifiche assegnate
+    ok: true,
+    isCoordinatore: haPermessiTotali,
+    materieAbilitate: doc.materie
   };
 }
