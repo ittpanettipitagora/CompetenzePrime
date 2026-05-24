@@ -22,7 +22,7 @@ function controllaEApplicaPermessi(classeSelezionata, emailUtente) {
 
   // Se la classe non esiste nel database permessi, blocca l'accesso
   if (!configClasse) {
-    alert("Errore: Configurazione permessi non trovata per la classe " + classeSelezionata);
+    alert("Accesso riservato: il docente non risulta assegnato alla classe " + classeSelezionata);
     window.location.href = "index.html";
     return null;
   }
