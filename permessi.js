@@ -6,7 +6,7 @@ const DOMINIO_SCUOLA = "panettipitagora.edu.it";
 
 // Super admin: accesso completo a tutto + pannello admin
 const SUPER_ADMIN_EMAILS = [
-  "alessandra.degaetano@panettipitagora.edu.it",
+"alessandra.degaetano@panettipitagora.edu.it",
 "dirigente@panettipitagora.edu.it"
 ];
 
@@ -730,21 +730,24 @@ const DB_DOCENTI = {
 // FUNZIONE DI CONTROLLO ACCESSO
 // ============================================================
 function getPermessiDocente(emailUtente, classeSelezionata) {
+  // 1. Controllo se è super admin
+  const isSuperAdmin = SUPER_ADMIN_EMAILS.includes(emailUtente);
+  
   const doc = DB_DOCENTI[emailUtente];
 
-  if (!doc) return { ok: false, motivo: "account_non_configurato" };
-
-  // Controllo se il docente è associato alla classe
-  if (!doc.classi.includes(classeSelezionata)) {
+  // Se è super admin, saltiamo il controllo classe, altrimenti verifichiamo il DB
+  if (!isSuperAdmin && !doc) return { ok: false, motivo: "account_non_configurato" };
+  if (!isSuperAdmin && !doc.classi.includes(classeSelezionata)) {
     return { ok: false, motivo: "classe_non_autorizzata" };
   }
 
-  // Definiamo i ruoli in modo pulito
-  const eCoordinatore = Array.isArray(doc.coordinatore) && doc.coordinatore.includes(classeSelezionata);
+  // 2. Determiniamo i permessi
+  const eCoordinatore = isSuperAdmin || (doc && Array.isArray(doc.coordinatore) && doc.coordinatore.includes(classeSelezionata));
   
   return {
     ok: true,
-    isCoordinatore: eCoordinatore, // True solo se è il coordinatore della classe
-    materieAbilitate: doc.materie  // Lista delle materie del docente
+    isCoordinatore: eCoordinatore,
+    isSuperAdmin: isSuperAdmin, // Passiamo questo flag al front-end
+    materieAbilitate: isSuperAdmin ? MATERIE : (doc ? doc.materie : []) 
   };
 }
