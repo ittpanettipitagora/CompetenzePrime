@@ -522,6 +522,7 @@ auth.onAuthStateChanged(user => {
           document.getElementById('header-classe').textContent = `Classe ${CLASSE_ATTUALE} - Accesso: ${user.email}`;
           
           avviaApp(); // Avvia solo se tutto è confermato
+          console.log("PERMESSI:", JSON.stringify(window.utentePermessi));
         } else {
           // SE NON È OK, MOSTRA ALERT E TORNA ALLA HOME
           alert("Accesso riservato: il docente non risulta assegnato al Consiglio di Classe di questa sezione.");
