@@ -739,15 +739,12 @@ function getPermessiDocente(emailUtente, classeSelezionata) {
     return { ok: false, motivo: "classe_non_autorizzata" };
   }
 
-  // NUOVA LOGICA: 
-  // 1. È coordinatore o sostegno o superadmin?
+  // Definiamo i ruoli in modo pulito
   const eCoordinatore = Array.isArray(doc.coordinatore) && doc.coordinatore.includes(classeSelezionata);
-  const haPermessiTotali = eCoordinatore || doc.sostegno || doc.superAdmin;
-
+  
   return {
     ok: true,
-    isCoordinatore: haPermessiTotali,
-    // Aggiungiamo anche le materie autorizzate
-    materieAbilitate: doc.materie
+    isCoordinatore: eCoordinatore, // True solo se è il coordinatore della classe
+    materieAbilitate: doc.materie  // Lista delle materie del docente
   };
 }
