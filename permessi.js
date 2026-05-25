@@ -1,5 +1,5 @@
 // permessi.js — Generato automaticamente dal verbale
-// Classi Prime (1A-1L) e Seconde (2A-2I) — A.S. 2024/25
+// Classi Prime (1A-1L) e Seconde (2A-2I) — A.S. 2025/26
 // ============================================================
 
 const DOMINIO_SCUOLA = "panettipitagora.edu.it";
