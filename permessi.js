@@ -733,11 +733,11 @@ const DB_DOCENTI = {
   "vito.lamantia@panettipitagora.edu.it": {
     nome: "La Mantia Vito",
     assegnazioni: {
-      "1E": ["CHIMICA", "SCIENZE"],
+      "1E": ["CHIMICA", "SCIENZE", "GEOGRAFIA"],
       "1F": ["CHIMICA", "SCIENZE", "GEOGRAFIA"],
       "1L": ["CHIMICA"],
       "2E": ["SCIENZE"],
-      "2F": ["CHIMICA", "SCIENZE"],
+      "2F": ["SCIENZE"],
       "2G": ["SCIENZE"]
     },
     coordinatore: [],
