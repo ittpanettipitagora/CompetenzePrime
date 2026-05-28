@@ -787,14 +787,53 @@ function getPermessiDocente(emailUtente, classeSelezionata) {
     };
   }
 }
+document.addEventListener("DOMContentLoaded", function() {
+  if (!window.location.pathname.includes("index.html")) {
+    // 1. Crea un contenitore per i bottoni di navigazione
+    const navContainer = document.createElement('div');
+    navContainer.id = "nav-container";
+    navContainer.style.display = "flex";
+    navContainer.style.gap = "10px";
+    navContainer.style.marginRight = "20px"; // Spazio dal bordo destro
+
+    // 2. Crea il bottone
+    const btn = document.createElement('button');
+    btn.innerText = "← Torna alla scelta delle classi"; // Scritta più corta per stare meglio
+    btn.style.padding = "6px 12px";
+    btn.style.background = "#4b5563";
+    btn.style.color = "white";
+    btn.style.border = "none";
+    btn.style.borderRadius = "6px";
+    btn.style.cursor = "pointer";
+    btn.style.fontFamily = "inherit";
+    btn.style.fontSize = "12px";
+    
+    btn.onclick = () => window.location.href = "https://ittpanettipitagora.github.io/Competenze/index.html";
+    
+    navContainer.appendChild(btn);
+
+    // 3. Inserisci il contenitore nell'header in modo intelligente
+    const header = document.querySelector('.app-header');
+    if (header) {
+      // Impostiamo l'header per distribuire gli spazi (flex)
+      header.style.display = "flex";
+      header.style.justifyContent = "space-between"; // Titolo a sx, Bottoni a dx
+      header.style.alignItems = "center";
+      
+      // Aggiunge il contenitore alla fine dell'header
+      header.appendChild(navContainer);
+    }
+  }
+});
 function doLogin() {
   const provider = new firebase.auth.GoogleAuthProvider();
-  firebase.auth().signInWithPopup(provider).then((result) => {
-    // Il login è avvenuto con successo
-    console.log("Login effettuato:", result.user.email);
-  }).catch((error) => {
-    // Gestione errori
-    console.error("Errore durante il login:", error);
-    alert("Errore durante il login: " + error.message);
+  firebase.auth().signInWithPopup(provider).catch((error) => {
+    alert("Errore nel login: " + error.message);
   });
 }
+firebase.auth().onAuthStateChanged(user => {
+  // Se sei in una pagina classe e non sei loggato, torna all'Hub
+  if (!user && !window.location.pathname.includes("https://ittpanettipitagora.github.io/Competenze/index.html")) {
+    window.location.href = "https://ittpanettipitagora.github.io/Competenze/index.html";
+  }
+});
