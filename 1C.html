@@ -164,7 +164,10 @@ td.level-1 { background: #fef2f2 !important; } td.level-2 { background: #fffbeb 
     <h1>Registro Competenze</h1>
     <div class="subtitle" id="header-classe">Caricamento in corso...</div>
   </div>
-  <div style="display: flex; gap: 10px;">
+  <div style="display: flex; gap: 10px; align-items: center;">
+    <div id="unsaved-indicator" style="display:none; align-items:center; gap:6px; background:#fef3c7; color:#92400e; border:1px solid #fcd34d; border-radius:6px; padding:6px 12px; font-size:12px; font-weight:600; font-family:var(--mono);">
+      ⚠️ Modifiche non salvate
+    </div>
     <button id="btn-salva" class="btn-salva-main" onclick="salvaTutto()" disabled>💾 Salva Dati</button>
     <button onclick="firebase.auth().signOut()" class="btn-salva-main" style="background:var(--red); display:none;" id="btn-logout">Esci</button>
   </div>
@@ -291,10 +294,20 @@ const LIVELLI_MAP = {1:"INIZIALE",2:"BASE",3:"INTERMEDIO",4:"AVANZATO"};
 const LEVEL_COLORS = {1:"level-1",2:"level-2",3:"level-3",4:"level-4"};
 const LIVELLI_PILL_CLS = {1:"l1",2:"l2",3:"l3",4:"l4"};
 
-let alunni = []; let voti = {}; let votiFacoltativi = {}; let avvaleIRC = {}; 
+let alunni = []; let voti = {}; let votiFacoltativi = {}; let avvaleIRC = {};
+let modificheNonSalvate = false;
 
 // AGGIUNTA 4: Variabile per memorizzare i permessi ricevuti
 window.utentePermessi = null;
+
+// Avviso se si tenta di uscire/ricaricare con modifiche non salvate
+window.addEventListener('beforeunload', function(e) {
+  if (modificheNonSalvate) {
+    e.preventDefault();
+    e.returnValue = 'Hai modifiche non salvate. Sei sicuro di voler uscire senza salvare?';
+    return e.returnValue;
+  }
+});
 
 function avviaApp() {
   document.getElementById('header-classe').textContent = `Classe ${CLASSE_ATTUALE}`;
@@ -342,12 +355,28 @@ function salvaTutto() {
     voti: voti, votiFacoltativi: votiFacoltativi, avvaleIRC: avvaleIRC,
     ultimoAggiornamento: firebase.firestore.FieldValue.serverTimestamp()
   }).then(() => {
+    modificheNonSalvate = false;
+    aggiornaIndicatoreModifiche();
     alert("✅ Dati della classe " + CLASSE_ATTUALE + " salvati con successo su Firebase!");
     btn.textContent = "💾 Salva Dati"; btn.disabled = false;
   }).catch((error) => {
     alert("❌ Errore: " + error.message);
     btn.textContent = "💾 Salva Dati"; btn.disabled = false;
   });
+}
+
+function aggiornaIndicatoreModifiche() {
+  const btn = document.getElementById('btn-salva');
+  const indicatore = document.getElementById('unsaved-indicator');
+  if (modificheNonSalvate) {
+    btn.style.background = 'var(--amber)';
+    btn.textContent = "💾 Salva Dati ●";
+    if (indicatore) indicatore.style.display = 'flex';
+  } else {
+    btn.style.background = 'var(--green)';
+    btn.textContent = "💾 Salva Dati";
+    if (indicatore) indicatore.style.display = 'none';
+  }
 }
 
 function renderElenco() {
@@ -389,12 +418,16 @@ function makeVotoSelect(alunno, materia, isChar, compIdx = -1) {
   return `<select class="voto-select" ${isDisabilitato ? 'disabled' : ''} onchange="setVoto('${alunno.replace(/'/g,"\\\\'")}','${materia}',+this.value, ${isChar}, ${compIdx})">${opts}</select>`;
 }
 function setVoto(alunno, materia, val, isChar, compIdx) {
+  modificheNonSalvate = true;
+  aggiornaIndicatoreModifiche();
   if (compIdx === -1 || isChar) { voti[alunno][materia] = val; renderGenerale(); renderAllComp(); }
   else { votiFacoltativi[alunno][compIdx][materia] = val; renderCompPage(compIdx); }
   renderRiepilogo(); renderAlert();
 }
 
 function toggleIRC(alunno) {
+  modificheNonSalvate = true;
+  aggiornaIndicatoreModifiche();
   avvaleIRC[alunno] = !avvaleIRC[alunno];
   if (!avvaleIRC[alunno]) { voti[alunno]['IRC'] = 0; for(let i=0; i<8; i++) votiFacoltativi[alunno][i]['IRC'] = 0; }
   renderElenco(); renderGenerale(); renderAllComp(); renderRiepilogo(); renderAlert();
@@ -522,6 +555,7 @@ auth.onAuthStateChanged(user => {
           document.getElementById('header-classe').textContent = `Classe ${CLASSE_ATTUALE} - Accesso: ${user.email}`;
           
           avviaApp(); // Avvia solo se tutto è confermato
+          console.log("PERMESSI:", JSON.stringify(window.utentePermessi));
         } else {
           // SE NON È OK, MOSTRA ALERT E TORNA ALLA HOME
           alert("Accesso riservato: il docente non risulta assegnato al Consiglio di Classe di questa sezione.");
