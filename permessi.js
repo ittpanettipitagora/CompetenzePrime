@@ -535,14 +535,20 @@ const DB_DOCENTI = {
     sostegno: false,
     superAdmin: false
   },
-  "michela.bonomo@panettipitagora.edu.it": {
-    nome: "Bonomo Michela",
-    classi: ["1A", "1B", "1L", "2A", "2B", "2I"],
-    materie: ["SCIENZE", "GEOGRAFIA", "CHIMICA"],
-    coordinatore: [],
-    sostegno: false,
-    superAdmin: false
+  "rosaria.parisi@panettipitagora.edu.it": {
+  nome: "Parisi Rosaria",
+  assegnazioni: {
+    "1A": ["GEOGRAFIA", "SCIENZE"],
+    "1B": ["SCIENZE", "GEOGRAFIA"],
+    "1L": ["GEOGRAFIA", "SCIENZE"],
+    "2A": ["SCIENZE"],
+    "2B": ["SCIENZE"],
+    "2I": ["SCIENZE", "CHIMICA", "LAB. CHIMICA"]
   },
+  coordinatore: [],
+  sostegno: false,
+  superAdmin: false
+},
   "michele.lapresa@panettipitagora.edu.it": {
     nome: "Lapresa Michele",
     classi: ["1C", "1D", "1L"],
