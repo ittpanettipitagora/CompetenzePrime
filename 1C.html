@@ -400,7 +400,7 @@ function renderElenco() {
 }
 
 function makeVotoSelect(alunno, materia, isChar, compIdx = -1) {
-  let v = (compIdx === -1 || isChar) ? (voti[alunno]?.[materia] ?? 0) : (votiFacoltativi[alunno]?.[compIdx]?.[materia] ?? 0);
+  let v = (compIdx === -1) ? (voti[alunno]?.[materia] ?? 0) : (votiFacoltativi[alunno]?.[compIdx]?.[materia] ?? 0);
   let opts = `<option value="0">${isChar ? '* da compilare' : ''}</option>`;
   for (let i=1;i<=4;i++) opts += `<option value="${i}" ${v===i?'selected':''}>${i} — ${LIVELLI[i]}</option>`;
   
@@ -420,8 +420,21 @@ function makeVotoSelect(alunno, materia, isChar, compIdx = -1) {
 function setVoto(alunno, materia, val, isChar, compIdx) {
   modificheNonSalvate = true;
   aggiornaIndicatoreModifiche();
-  if (compIdx === -1 || isChar) { voti[alunno][materia] = val; renderGenerale(); renderAllComp(); }
-  else { votiFacoltativi[alunno][compIdx][materia] = val; renderCompPage(compIdx); }
+  if (compIdx === -1) {
+    const oldVal = voti[alunno][materia];
+    voti[alunno][materia] = val;
+    // Propaga alle competenze solo se non erano già state personalizzate
+    for (let ci = 0; ci < 8; ci++) {
+      if ((votiFacoltativi[alunno]?.[ci]?.[materia] ?? 0) === oldVal) {
+        votiFacoltativi[alunno][ci][materia] = val;
+      }
+    }
+    renderGenerale(); renderAllComp();
+  } else {
+    // Modifica da Competenza: aggiorna SOLO votiFacoltativi di quella competenza
+    votiFacoltativi[alunno][compIdx][materia] = val;
+    renderCompPage(compIdx);
+  }
   renderRiepilogo(); renderAlert();
 }
 
