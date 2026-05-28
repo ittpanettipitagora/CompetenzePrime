@@ -6,7 +6,7 @@ const DOMINIO_SCUOLA = "panettipitagora.edu.it";
 
 // Super admin: accesso completo a tutto + pannello admin
 const SUPER_ADMIN_EMAILS = [
-"alessandra.degaetano@panettipitagora.edu.it",
+//"alessandra.degaetano@panettipitagora.edu.it",
 "dirigente@panettipitagora.edu.it",
   "giuseppe.mastrandrea@panettipitagora.edu.it"
 ];
@@ -56,7 +56,7 @@ const DB_DOCENTI = {
   "alessandra.degaetano@panettipitagora.edu.it": {
     nome: "De Gaetano Alessandra",
     classi: ["2G"],
-    materie: ["STA"],
+    materie: ["STA","ED. CIVICA"],
     coordinatore: [],
     sostegno: false,
     superAdmin: false
