@@ -720,7 +720,7 @@ const DB_DOCENTI = {
   "vita.magrone@panettipitagora.edu.it": {
     nome: "Magrone Vita",
     assegnazioni: {
-      "1C": ["CHIMICA", "SCIENZE"],
+      "1C": ["CHIMICA", "SCIENZE", "GEOGRAFIA"],
       "1D": ["CHIMICA", "GEOGRAFIA", "SCIENZE"],
       "1G": ["CHIMICA", "SCIENZE"],
       "2C": ["CHIMICA", "SCIENZE"],
