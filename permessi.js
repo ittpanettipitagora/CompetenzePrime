@@ -787,3 +787,14 @@ function getPermessiDocente(emailUtente, classeSelezionata) {
     };
   }
 }
+function doLogin() {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  firebase.auth().signInWithPopup(provider).then((result) => {
+    // Il login è avvenuto con successo
+    console.log("Login effettuato:", result.user.email);
+  }).catch((error) => {
+    // Gestione errori
+    console.error("Errore durante il login:", error);
+    alert("Errore durante il login: " + error.message);
+  });
+}
