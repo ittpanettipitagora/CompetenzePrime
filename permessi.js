@@ -88,7 +88,7 @@ const DB_DOCENTI = {
   "anna.piccolo@panettipitagora.edu.it": {
     nome: "Piccolo Anna",
     classi: ["1A", "1B", "2A", "2B", "2I"],
-    materie: ["DIRITTO"],
+    materie: ["DIRITTO","ED. CIVICA"],
     coordinatore: [],
     sostegno: false,
     superAdmin: false
@@ -220,7 +220,7 @@ const DB_DOCENTI = {
   "antoniomaria.scalioti@panettipitagora.edu.it": {
     nome: "Scalioti Antonio Maria",
     classi: ["1E", "2E", "2F"],
-    materie: ["DIRITTO"],
+    materie: ["DIRITTO","ED. CIVICA"],
     coordinatore: [],
     sostegno: false,
     superAdmin: false
@@ -308,7 +308,7 @@ const DB_DOCENTI = {
   "flavia.bianconi@panettipitagora.edu.it": {
     nome: "Bianconi Flavia",
     classi: ["1F", "1G", "2G"],
-    materie: ["DIRITTO"],
+    materie: ["DIRITTO","ED. CIVICA"],
     coordinatore: [],
     sostegno: false,
     superAdmin: false
@@ -554,7 +554,7 @@ const DB_DOCENTI = {
   "modesta.colucci@panettipitagora.edu.it": {
     nome: "Colucci Modesta",
     classi: ["1H", "1L", "2H"],
-    materie: ["DIRITTO"],
+    materie: ["DIRITTO","ED. CIVICA"],
     coordinatore: [],
     sostegno: false,
     superAdmin: false
@@ -690,7 +690,7 @@ const DB_DOCENTI = {
   "tiziana.ciraci@panettipitagora.edu.it": {
     nome: "Ciraci Tiziana",
     classi: ["1C", "1D", "1I", "2C", "2D"],
-    materie: ["DIRITTO"],
+    materie: ["DIRITTO","ED. CIVICA"],
     coordinatore: [],
     sostegno: false,
     superAdmin: false
