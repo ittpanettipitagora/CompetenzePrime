@@ -543,7 +543,7 @@ const DB_DOCENTI = {
     "1L": ["GEOGRAFIA", "SCIENZE"],
     "2A": ["SCIENZE"],
     "2B": ["SCIENZE"],
-    "2I": ["SCIENZE", "CHIMICA", "LAB. CHIMICA"]
+    "2I": ["SCIENZE", "CHIMICA"]
   },
   coordinatore: [],
   sostegno: false,
