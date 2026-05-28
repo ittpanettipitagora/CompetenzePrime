@@ -329,7 +329,7 @@ const DB_DOCENTI = {
   },
   "francesco.avellis@panettipitagora.edu.it": {
     nome: "Avellis Francesco",
-    classi: ["1A", "1B", "1C", "1D", "1F", "1H", "1I", "1L", "2A", "2B", "2C", "2D", "2E", "2F", "2H"],
+    classi: ["1A", "1B", "1C", "1D", "1F", "1H", "1I", "1L", "2A", "2B", "2C", "2D", "2E", "2F", "2H","2I"],
     materie: ["CHIMICA"],
     coordinatore: [],
     sostegno: false,
