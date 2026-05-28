@@ -291,7 +291,7 @@ const DB_DOCENTI = {
   },
   "domenico.terrafino@panettipitagora.edu.it": {
     nome: "Terrafino Domenico",
-    classi: ["1C", "1E", "1F", "1H", "2C", "2E", "2F", "2H"],
+    classi: ["1C", "1E", "1F", "1H", "2C", "2E", "2F"],
     materie: ["TTRG"],
     coordinatore: [],
     sostegno: false,
