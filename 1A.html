@@ -422,9 +422,12 @@ function setVoto(alunno, materia, val, isChar, compIdx) {
   aggiornaIndicatoreModifiche();
   if (compIdx === -1) {
     voti[alunno][materia] = val;
-    // Propaga SEMPRE a tutte le competenze
+    // Propaga SOLO alle competenze dove la materia è caratterizzante (★)
+    const materiaIdx = MATERIE.indexOf(materia);
     for (let ci = 0; ci < 8; ci++) {
-      votiFacoltativi[alunno][ci][materia] = val;
+      if (COMP_CONFIG[ci].char.includes(materiaIdx)) {
+        votiFacoltativi[alunno][ci][materia] = val;
+      }
     }
     renderGenerale(); renderAllComp();
   } else {
