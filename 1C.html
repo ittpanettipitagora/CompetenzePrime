@@ -421,13 +421,10 @@ function setVoto(alunno, materia, val, isChar, compIdx) {
   modificheNonSalvate = true;
   aggiornaIndicatoreModifiche();
   if (compIdx === -1) {
-    const oldVal = voti[alunno][materia];
     voti[alunno][materia] = val;
-    // Propaga alle competenze solo se non erano già state personalizzate
+    // Propaga SEMPRE a tutte le competenze
     for (let ci = 0; ci < 8; ci++) {
-      if ((votiFacoltativi[alunno]?.[ci]?.[materia] ?? 0) === oldVal) {
-        votiFacoltativi[alunno][ci][materia] = val;
-      }
+      votiFacoltativi[alunno][ci][materia] = val;
     }
     renderGenerale(); renderAllComp();
   } else {
