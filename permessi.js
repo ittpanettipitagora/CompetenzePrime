@@ -812,18 +812,17 @@ function getPermessiDocente(emailUtente, classeSelezionata) {
 }
 function inserisciBottoneTorna() {
   if (window.location.pathname.includes("index.html") || window.location.pathname === "/" || window.location.pathname === "") return;
-  if (document.getElementById("nav-container")) return; // già inserito
+  if (document.getElementById("btn-torna-classi")) return; // già inserito
 
-  const header = document.querySelector('.app-header');
-  if (!header) return;
-
-  const navContainer = document.createElement('div');
-  navContainer.id = "nav-container";
-  navContainer.style.cssText = "display:flex;gap:10px;margin-right:12px;flex-shrink:0;";
+  // Cerca il div dei bottoni a destra nell'header
+  const btnContainer = document.querySelector('.app-header > div[style*="flex"]') 
+                    || document.querySelector('.app-header > div');
+  if (!btnContainer) return;
 
   const btn = document.createElement('button');
+  btn.id = "btn-torna-classi";
   btn.innerText = "← Classi";
-  btn.title = "Torna alla scelta delle classi";
+  btn.title = "Torna all'hub principale";
   btn.style.cssText = "padding:6px 12px;background:#4b5563;color:white;border:none;border-radius:6px;cursor:pointer;font-family:inherit;font-size:12px;white-space:nowrap;";
   btn.onmouseenter = () => btn.style.background = "#6b7280";
   btn.onmouseleave = () => btn.style.background = "#4b5563";
@@ -834,8 +833,8 @@ function inserisciBottoneTorna() {
     window.location.href = "https://ittpanettipitagora.github.io/Competenze/index.html";
   };
 
-  navContainer.appendChild(btn);
-  header.appendChild(navContainer);
+  // Inserisce come primo elemento nel div dei bottoni
+  btnContainer.insertBefore(btn, btnContainer.firstChild);
 }
 
 document.addEventListener("DOMContentLoaded", inserisciBottoneTorna);
