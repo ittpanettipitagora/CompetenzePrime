@@ -810,35 +810,6 @@ function getPermessiDocente(emailUtente, classeSelezionata) {
     };
   }
 }
-function inserisciBottoneTorna() {
-  if (window.location.pathname.includes("index.html") || window.location.pathname === "/" || window.location.pathname === "") return;
-  if (document.getElementById("btn-torna-classi")) return; // già inserito
-
-  const btnContainer = document.querySelector('.app-header > div');
-  if (!btnContainer) {
-    setTimeout(inserisciBottoneTorna, 300);
-    return;
-  }
-
-  const btn = document.createElement('button');
-  btn.id = "btn-torna-classi";
-  btn.innerText = "← Classi";
-  btn.title = "Torna all'hub principale";
-  btn.style.cssText = "padding:6px 12px;background:#4b5563;color:white;border:none;border-radius:6px;cursor:pointer;font-family:inherit;font-size:12px;white-space:nowrap;";
-  btn.onmouseenter = () => btn.style.background = "#6b7280";
-  btn.onmouseleave = () => btn.style.background = "#4b5563";
-  btn.onclick = () => {
-    if (window.modificheNonSalvate) {
-      if (!confirm("Hai modifiche non salvate. Vuoi uscire lo stesso?")) return;
-    }
-    window.location.href = "https://ittpanettipitagora.github.io/Competenze/index.html";
-  };
-
-  btnContainer.insertBefore(btn, btnContainer.firstChild);
-}
-
-document.addEventListener("DOMContentLoaded", inserisciBottoneTorna);
-setTimeout(inserisciBottoneTorna, 500);
 function doLogin() {
   const provider = new firebase.auth.GoogleAuthProvider();
   firebase.auth().signInWithPopup(provider).catch((error) => {
@@ -846,8 +817,28 @@ function doLogin() {
   });
 }
 firebase.auth().onAuthStateChanged(user => {
-  // Se sei in una pagina classe e non sei loggato, torna all'Hub
-  if (!user && !window.location.pathname.includes("https://ittpanettipitagora.github.io/Competenze/index.html")) {
+  if (!user && !window.location.pathname.includes("index.html")) {
     window.location.href = "https://ittpanettipitagora.github.io/Competenze/index.html";
   }
+});
+
+// ============================================================
+// LOGGING ACCESSI E SALVATAGGI
+// ============================================================
+function logAzione(tipo, extra = {}) {
+  const user = firebase.auth().currentUser;
+  if (!user) return;
+  const db = firebase.firestore();
+  db.collection("logs").add({
+    tipo: tipo,
+    email: user.email,
+    nome: user.displayName || '',
+    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    pagina: window.location.pathname,
+    ...extra
+  }).catch(e => console.warn("Log fallito:", e));
+}
+
+firebase.auth().onAuthStateChanged(user => {
+  if (user) logAzione('accesso');
 });
