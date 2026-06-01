@@ -49,18 +49,16 @@ body {
 .app-header {
   background: var(--text);
   color: #fff;
-  padding: 0 24px;
-  display: flex;
+  padding: 0 16px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: space-between;
+  gap: 10px;
   height: 60px;
   position: sticky;
   top: 0;
   z-index: 100;
 }
-.header-left { display: flex; flex-direction: column; }
-.app-header h1 { font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; font-family: var(--mono); }
-.app-header .subtitle { font-size: 11px; color: #9ca3af; font-family: var(--mono); margin-top: 2px; }
 
 .btn-salva-main {
   background: var(--green); color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: opacity 0.2s;
@@ -160,16 +158,19 @@ td.level-1 { background: #fef2f2 !important; } td.level-2 { background: #fffbeb 
 </div>
 
 <header class="app-header">
-  <div class="header-left">
-    <h1>Registro Competenze</h1>
-    <div class="subtitle" id="header-classe">Caricamento in corso...</div>
+  <div style="display:flex;flex-direction:column;">
+    <span style="font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#fff;">Registro Competenze</span>
+    <span id="header-classe" style="font-family:var(--mono);font-size:11px;color:#9ca3af;"></span>
   </div>
-  <div style="display: flex; gap: 10px; align-items: center;">
+  <div style="display:flex; gap:10px; align-items:center; justify-content:center;">
     <div id="unsaved-indicator" style="display:none; align-items:center; gap:6px; background:#fef3c7; color:#92400e; border:1px solid #fcd34d; border-radius:6px; padding:6px 12px; font-size:12px; font-weight:600; font-family:var(--mono);">
       ⚠️ Modifiche non salvate
     </div>
     <button id="btn-salva" class="btn-salva-main" onclick="salvaTutto()" disabled>💾 Salva Dati</button>
-    <button onclick="firebase.auth().signOut()" class="btn-salva-main" style="background:var(--red); display:none;" id="btn-logout">Esci</button>
+    <button onclick="esciConControllo()" class="btn-salva-main" style="background:var(--red); display:none;" id="btn-logout">⏏ Esci</button>
+  </div>
+  <div style="display:flex; justify-content:flex-end;">
+    <button onclick="window.location.href='https://ittpanettipitagora.github.io/Competenze/index.html'" style="padding:6px 12px;background:#4b5563;color:white;border:none;border-radius:6px;cursor:pointer;font-family:inherit;font-size:12px;">← Torna alle classi</button>
   </div>
 </header>
 
@@ -273,7 +274,7 @@ const ELENCO_SCUOLA = [
   ["BASSI ANDREA","1E"],["BELVISO NICOLA","1E"],["BORREGGINE LEONARDO FILIPPO","1E"],["BURDI RUBEN","1E"],["BUSCO ANDREA","1E"],["CARONE GIANFRANCO","1E"],["CASADIBARI NICOLA","1E"],["CASSANO GABRIELE FRANCESCO","1E"],["CORALLO MARIANO","1E"],["COSTANTINO NICOLA","1E"],["DE BENEDICTIS ANTONIO","1E"],["GJOKA HAKI","1E"],["LAVOPA GIOSUE'","1E"],["LOTITO GABRIELE","1E"],["MAZZACANE RAFFAELE NICOLAS","1E"],["MITAROTONDA DAVIDE","1E"],["PALMISANO VINCENZO","1E"],["PETTI MARCO","1E"],["RICCI GIUSEPPE","1E"],["TOMASELLI FRANCESCO","1E"],
   ["ALBERGA NICOLO'","1F"],["AMJAD MOUSA","1F"],["ARGONDIZZA MATTIA","1F"],["ARMENISE GABRIELE","1F"],["BELLOMO GABRIELE","1F"],["CALABRESE FRANCESCO","1F"],["CICCHELLI FRANCESCO","1F"],["DE MARZO MICHELE","1F"],["DE TULLIO FRANCESCO CLETO","1F"],["DI CANIO ADRIANO","1F"],["GRANDOLFO MICHELE","1F"],["GRECO DAVIDE","1F"],["KONGTO RACHANON","1F"],["LONGO VITO","1F"],["MATERA MATTIA","1F"],["MICCOLI GABRIEL","1F"],["MORETTI VITO","1F"],["SILVESTRIS CHRISTIAN","1F"],["SPICONARDO NICOLAS","1F"],["SPIZZICO DONATO","1F"],["TORRES IVAN GAETANO","1F"],
   ["ARMENISE GIUSEPPE","1G"],["CAPODIFERRO DOMENICO","1G"],["CAVONE FRANCESCO","1G"],["CIANCI FRANCESCO","1G"],["DE PALO MARCELLO","1G"],["DI RELLA PAVEL","1G"],["FERRARA MARISOL LOLA","1G"],["LORUSSO PAOLO","1G"],["LUVERA NICOLA","1G"],["MARRA COSIMO","1G"],["MONACHINO GIANLUCA","1G"],["MONTARULI CRISTIAN","1G"],["MONTERISI APOLLONIA JONELLA","1G"],["PALMITESSA ALESSANDRO","1G"],["SALVATORE DAVIDE","1G"],["SCATTARELLI DOMENICO","1G"],["SEMERARO LEONARDO","1G"],["STALLONE RAFFAELE","1G"],["TALPUR MIR MUBARAK ALI","1G"],
-  ["CASSANO ANDREA","1H"],["CHEN ANTONIO","1H"],["CORINNA NICOLÒ","1H"],["CRUDELE MARCO","1H"],["DEL CONSOLE NICOLA","1H"],["DELMEDICO FRANCESCO","1H"],["DI MAURO CHRISTIAN","1H"],["GAMBACORTA DAVIDE","1H"],["GATTI GIUSEPPE","1H"],["GELAO ANDREA","1H"],["GELAO FRANCESCO","1H"],["IACOBBE FRANCESCO","1H"],["MATTEO DANIEL","1H"],["MINENNA VITTORIO","1H"],["MINERVA MATTIA","1H"],["MININNI SAMUELE","1H"],["MORA FLAVIO","1H"],["ROMITO LUCA","1H"],["SERINI LUCA","1H"],["TSKHADADZE GABRIELI","1H"],
+  ["CASSANO ANDREA","1H"],["CHEN ANTONIO","1H"],["CORINNA NICOLÒ","1H"],["CRUDELE MARCO","1H"],["DEL CONSOLE NICOLA","1H"],["DELMEDICO FRANCESCO","1H"],["DI MAURO CHRISTIAN","1H"],["GAMBACORTA DAVIDE","1H"],["GATTI GIUSEPPE","1H"],["GELAO ANDREA","1H"],["GELAO FRANCESCO","1H"],["IACOBBE FRANCESCO","1H"],["MATTEO DANIEL","1H"],["MINENNA VITTORIO","1H"],["MINERVA MATTIA","1H"],["MININNI SAMUELE","1H"],["MORA FLAVIO","1H"],["ROMITO LUCA","1H"],["SERINI LUCA","1H"],["SIBILIO FABRIZIO","1H"],["TSKHADADZE GABRIELI","1H"],
   ["BAUTISTA KLEIN HENSLEY","1I"],["BINETTI ANGELO SERGIO","1I"],["BONANTE DANIELE DONATO","1I"],["BONERBA MATTIA","1I"],["BRUNO ROBERTO PIO","1I"],["BUFO VITTORIANO ANTONIO","1I"],["CHIRONNA ALESSIO","1I"],["CORALLO DALILA","1I"],["DE BENEDICTIS CLAUDIO","1I"],["DE FANO NICOLA","1I"],["DE PALMA SAMUELE","1I"],["FASANO MICHELE","1I"],["GARGANO ALESSANDRO","1I"],["HOSSAN MD ALTAF","1I"],["LOPORCARO ANDREA","1I"],["MILELLA ANDREA","1I"],["NOCCHIERE LORENZO VITO","1I"],["PEPE KEVIN","1I"],["SALTARELLI SAMUELE","1I"],["SELVAGGI BENIAMINO","1I"],["VERGARA SOFIA","1I"],
   ["BRESCIA ALBERTO","1L"],["BURTCHULADZE SHOTIKO","1L"],["CHIARAPPA ALESSANDRO","1L"],["DASIA CHRISTIAN","1L"],["DE RENZIO FRANCESCO","1L"],["DIDONA GABRIELE","1L"],["GATTULLI GIULIO","1L"],["GESUITO CRISTIANO","1L"],["LETI BENEDETTO","1L"],["MAIURANO ALESSANDRO","1L"],["NDOUR MOKHAMADOU LAMINE","1L"],["OLIVIERI GIULIO NICOLA","1L"],["OTTOMANO FRANCESCO","1L"],["PECONIO VITO","1L"],["PETRUZZELLI CHRISTIAN","1L"],["PETRUZZELLI MATTEO","1L"],["PIGNATELLI ETTORE","1L"],["RUGGIERO FLAVIO","1L"],["SANTORO PIERDAVIDE","1L"],["SINGH NAVDEEP","1L"],["SOKO EDLIR PIO","1L"],["SORRENTINO ALESSANDRO","1L"],["VALENTE FRANCESCO CARLO","1L"]
 ];
@@ -357,13 +358,20 @@ function salvaTutto() {
   }).then(() => {
     modificheNonSalvate = false;
     aggiornaIndicatoreModifiche();
-     if (window.logAzione) logAzione('salvataggio', { classe: CLASSE_ATTUALE });
+    if (window.logAzione) logAzione('salvataggio', { classe: CLASSE_ATTUALE });
     alert("✅ Dati della classe " + CLASSE_ATTUALE + " salvati con successo su Firebase!");
     btn.textContent = "💾 Salva Dati"; btn.disabled = false;
   }).catch((error) => {
     alert("❌ Errore: " + error.message);
     btn.textContent = "💾 Salva Dati"; btn.disabled = false;
   });
+}
+
+function esciConControllo() {
+  if (window.modificheNonSalvate) {
+    if (!confirm("Hai modifiche non salvate. Se esci ora i dati andranno persi. Vuoi davvero uscire?")) return;
+  }
+  firebase.auth().signOut();
 }
 
 function aggiornaIndicatoreModifiche() {
