@@ -814,10 +814,11 @@ function inserisciBottoneTorna() {
   if (window.location.pathname.includes("index.html") || window.location.pathname === "/" || window.location.pathname === "") return;
   if (document.getElementById("btn-torna-classi")) return; // già inserito
 
-  // Cerca il div dei bottoni a destra nell'header
-  const btnContainer = document.querySelector('.app-header > div[style*="flex"]') 
-                    || document.querySelector('.app-header > div');
-  if (!btnContainer) return;
+  const btnContainer = document.querySelector('.app-header > div');
+  if (!btnContainer) {
+    setTimeout(inserisciBottoneTorna, 300);
+    return;
+  }
 
   const btn = document.createElement('button');
   btn.id = "btn-torna-classi";
@@ -833,12 +834,11 @@ function inserisciBottoneTorna() {
     window.location.href = "https://ittpanettipitagora.github.io/Competenze/index.html";
   };
 
-  // Inserisce come primo elemento nel div dei bottoni
   btnContainer.insertBefore(btn, btnContainer.firstChild);
 }
 
 document.addEventListener("DOMContentLoaded", inserisciBottoneTorna);
-if (document.readyState !== "loading") inserisciBottoneTorna();
+setTimeout(inserisciBottoneTorna, 500);
 function doLogin() {
   const provider = new firebase.auth.GoogleAuthProvider();
   firebase.auth().signInWithPopup(provider).catch((error) => {
