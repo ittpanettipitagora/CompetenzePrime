@@ -357,6 +357,7 @@ function salvaTutto() {
   }).then(() => {
     modificheNonSalvate = false;
     aggiornaIndicatoreModifiche();
+    if (window.logAzione) logAzione('salvataggio', { classe: CLASSE_ATTUALE });
     alert("✅ Dati della classe " + CLASSE_ATTUALE + " salvati con successo su Firebase!");
     btn.textContent = "💾 Salva Dati"; btn.disabled = false;
   }).catch((error) => {

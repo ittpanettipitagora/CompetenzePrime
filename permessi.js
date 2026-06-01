@@ -756,6 +756,28 @@ const DB_DOCENTI = {
 };
 
 // ============================================================
+// LOGGING ACCESSI E SALVATAGGI
+// ============================================================
+function logAzione(tipo, extra = {}) {
+  const user = firebase.auth().currentUser;
+  if (!user) return;
+  const db = firebase.firestore();
+  db.collection("logs").add({
+    tipo: tipo,
+    email: user.email,
+    nome: user.displayName || '',
+    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    pagina: window.location.pathname,
+    ...extra
+  }).catch(e => console.warn("Log fallito:", e));
+}
+
+// Log accesso automatico
+firebase.auth().onAuthStateChanged(user => {
+  if (user) logAzione('accesso');
+});
+
+// ============================================================
 // FUNZIONE DI CONTROLLO ACCESSO
 // ============================================================
 function getPermessiDocente(emailUtente, classeSelezionata) {
