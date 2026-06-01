@@ -498,7 +498,9 @@ function computeCompRow(alunno, cfg, compIdx) {
   const charSet = new Set(cfg.char); let totalPts = 0; let numFilled = 0; let allCharFilled = true;
   MATERIE.forEach((m, mi) => {
     if (m === 'IRC' && avvaleIRC[alunno] === false) return;
-    const isChar = charSet.has(mi); let v = isChar ? voti[alunno]?.[m] : votiFacoltativi[alunno]?.[compIdx]?.[m];
+    const isChar = charSet.has(mi);
+    // Legge sempre da votiFacoltativi per il calcolo del riepilogo
+    let v = votiFacoltativi[alunno]?.[compIdx]?.[m];
     if (v > 0) { totalPts += v; numFilled++; }
     if (isChar && (!v || v === 0)) allCharFilled = false;
   });
