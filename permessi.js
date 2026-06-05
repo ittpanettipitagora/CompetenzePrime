@@ -242,6 +242,14 @@ const DB_DOCENTI = {
     sostegno: false,
     superAdmin: false
   },
+  "carla.saracino@panettipitagora.edu.it": {
+    nome: "Saracino Carla",
+    classi: ["2H"],
+    materie: [],
+    coordinatore: [],
+    sostegno: true,
+    superAdmin: false
+  },
   "carmela.degiglio@panettipitagora.edu.it": {
     nome: "De Giglio Carmela",
     classi: ["1H", "1I", "2H"],
@@ -590,7 +598,7 @@ const DB_DOCENTI = {
     sostegno: false,
     superAdmin: false
   },
-  "paola.demarzo@panettipitagora.edu.it": {
+  "demarzo.paola@panettipitagora.edu.it": {
     nome: "De Marzo Paola",
     classi: ["2A", "2B", "2I"],
     materie: ["ITALIANO", "STORIA"],
