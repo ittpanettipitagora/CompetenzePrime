@@ -77,7 +77,7 @@ const DB_DOCENTI = {
     sostegno: false,
     superAdmin: false
   },
-  "andreinavaleria.putignano@panettipitagora.edu.it": {
+  "andreina.putignano@panettipitagora.edu.it": {
     nome: "Putignano Andreina Valeria",
     classi: ["1F", "1H", "2D", "2G", "2H"],
     materie: ["INGLESE"],
