@@ -1,0 +1,10 @@
+1) l'hanno prossimo controllare nomi alunni con accenti e sostituire l'apostrofo con l'accento
+2) l'apostrofo nel cognome va semplicemente tolto
+3) andreina ha la mail andreina.putignano e non andreinavaleria.putignano
+4) paola de marzo ha mail al contrario demarzo.paola
+5) per le seconde basterà cambiare const dati alunni 
+6) per le prime bisogna definire le competenze nelle prime per i vari indirizzi
+7) da 6) devo usare uno schema tipo quello usato per pulito, magrone, lamantia
+8) Trovati due bug in permessi.js:
+8a) Bug 1 — logAzione definita due volte (righe 769 e 836) — JavaScript la sovrascrive silenziosamente, ma è un errore.
+8b) Bug 2 — onAuthStateChanged registrato tre volte — uno di questi fa la redirect a index.html se l'utente non è loggato, ma si attiva anche durante il caricamento della pagina prima che Firebase abbia ripristinato la sessione → può rimandare utenti già loggati alla home.
